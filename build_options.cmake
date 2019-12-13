@@ -27,6 +27,7 @@ endif()
 option(CXX_STANDARD_REQUIRED "Require C++17 standard" ON)
 if(CXX_STANDARD_REQUIRED)
     set(CMAKE_CXX_STANDARD 17)  # Use C++17 standard
+    set(CMAKE_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)
 endif()
 
@@ -62,7 +63,7 @@ if(NOT ${BUILD_SHARED_LIBS})
 endif()
 
 
-option(USE_OUTPUT_PATH "buld all libaries and runtime files at build/lib and build/bin" ON)
+option(USE_OUTPUT_PATH "build all libaries and runtime files at build/lib and build/bin" ON)
 if(USE_OUTPUT_PATH)
     # -----------------------------------------------------------------------
     # Where to put all the LIBRARY targets when built.  This variable is used
