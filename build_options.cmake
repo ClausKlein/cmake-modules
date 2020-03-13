@@ -38,7 +38,7 @@ if(COMPILER_WARNINGS_ARE_ERRORS)
         add_compile_options(/W4 /WX)
     else()
         # lots of warnings and all warnings as errors
-        add_compile_options(-Wall -Wextra -Wpedantic -Werror
+        add_compile_options(-Wall -Wextra -Wpedantic ### -Werror
           ##TBD -Wno-unknown-warning-option
           -Wno-unused-parameter
           -Wno-unused-variable
@@ -82,3 +82,6 @@ if(USE_OUTPUT_PATH)
     # -----------------------------------------------------------------------
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 endif()
+
+include(${CMAKE_CURRENT_LIST_DIR}/clang-tidy.cmake)
+

@@ -1,3 +1,5 @@
+include_guard(DIRECTORY)
+
 option(ENABLE_CLANG_TIDY "Add clang-tidy checks automatically as prebuild step" OFF)
 
 find_program(CLANG_TIDY_EXE
