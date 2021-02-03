@@ -39,7 +39,7 @@ if(CLANG_TIDY_EXE)
         add_custom_command(TARGET check PRE_BUILD
             # -p BUILD_PATH Path used to read a compile command database (compile_commands.json).
             # NOTE: we use default checks from .clang-tidy and we check src tree only yet!
-            COMMAND ${CLANG_TIDY_RUNNER} -p ${CMAKE_CURRENT_BINARY_DIR} src
+            COMMAND ${CLANG_TIDY_RUNNER} -p ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}   # location of compile_commands.json
             COMMENT "Running check on targets at ${CMAKE_CURRENT_SOURCE_DIR} ..."
             VERBATIM
