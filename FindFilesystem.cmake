@@ -1,5 +1,7 @@
 # Distributed under the OSI-approved BSD 3-Clause License.  See accompanying
 # file Copyright.txt or https://cmake.org/licensing for details.
+# from:
+# https://github.com/vector-of-bool/CMakeCM
 
 #[=======================================================================[.rst:
 
@@ -102,7 +104,7 @@ if(TARGET std::filesystem)
     return()
 endif()
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.13)
 
 include(CMakePushCheckState)
 include(CheckIncludeFileCXX)
@@ -127,6 +129,9 @@ set(CMAKE_REQUIRED_QUIET ${Filesystem_FIND_QUIETLY})
 
 # All of our tests required C++17 or later
 set(CMAKE_CXX_STANDARD 17)
+if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Linux")
+    set(CMAKE_REQUIRED_LIBRARIES -lpthread)
+endif()
 
 # Normalize and check the component list we were given
 set(want_components ${Filesystem_FIND_COMPONENTS})
@@ -199,7 +204,9 @@ if(CXX_FILESYSTEM_HAVE_FS)
 
         int main() {
             auto cwd = @CXX_FILESYSTEM_NAMESPACE@::current_path();
-            printf("%s", cwd.c_str());
+            if(@CXX_FILESYSTEM_NAMESPACE@::exists(cwd)) {
+                printf("%s", cwd.c_str());
+            }
             return EXIT_SUCCESS;
         }
     ]] code @ONLY)
@@ -231,9 +238,9 @@ if(CXX_FILESYSTEM_HAVE_FS)
         if(CXX_FILESYSTEM_NO_LINK_NEEDED)
             # Nothing to add...
         elseif(CXX_FILESYSTEM_STDCPPFS_NEEDED)
-            set_property(TARGET std::filesystem APPEND PROPERTY INTERFACE_LINK_LIBRARIES -lstdc++fs)
+            set_property(TARGET std::filesystem APPEND PROPERTY INTERFACE_LINK_LIBRARIES -lstdc++fs ${prev_libraries})
         elseif(CXX_FILESYSTEM_CPPFS_NEEDED)
-            set_property(TARGET std::filesystem APPEND PROPERTY INTERFACE_LINK_LIBRARIES -lc++fs)
+            set_property(TARGET std::filesystem APPEND PROPERTY INTERFACE_LINK_LIBRARIES -lc++fs ${prev_libraries})
         endif()
     endif()
 endif()
