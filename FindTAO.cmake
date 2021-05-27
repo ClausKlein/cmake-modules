@@ -157,7 +157,7 @@ if(TAO_INCLUDE_DIR
     file(STRINGS ${TAO_VERSION_HEADER} TAO_TEMP REGEX "^#define TAO_[A-Z]+_VERSION[ \t]+[0-9]+$")
     string(REGEX REPLACE ".*#define TAO_MAJOR_VERSION[ \t]+([0-9]+).*" "\\1" TAO_VERSION_MAJOR ${TAO_TEMP})
     string(REGEX REPLACE ".*#define TAO_MINOR_VERSION[ \t]+([0-9]+).*" "\\1" TAO_VERSION_MINOR ${TAO_TEMP})
-    string(REGEX REPLACE ".*#define TAO_BETA_VERSION[ \t]+([0-9]+).*" "\\1" TAO_VERSION_PATCH ${TAO_TEMP})
+    string(REGEX REPLACE ".*#define TAO_MICRO_VERSION[ \t]+([0-9]+).*" "\\1" TAO_VERSION_PATCH ${TAO_TEMP})
   else()
     message(WARNING "Could not find TAO version header ${TAO_VERSION_HEADER}")
     set(TAO_VERSION_MAJOR X)
@@ -166,9 +166,12 @@ if(TAO_INCLUDE_DIR
   endif()
   set(TAO_VERSION ${TAO_VERSION_MAJOR}.${TAO_VERSION_MINOR}.${TAO_VERSION_PATCH})
   message(STATUS "  Found TAO version ${TAO_VERSION} in ${TAO_ROOT_DIR}")
+  # message(STATUS "  Found TAO in ${TAO_LIBRARY_DIR}")
 
-  set(TAO_FOUND TRUE)
-  message(STATUS "  Found TAO in ${TAO_LIBRARY_DIR}")
+  include(FindPackageHandleStandardArgs)
+  find_package_handle_standard_args(TAO DEFAULT_MSG TAO_VERSION TAO_INCLUDE_DIRS ACE_LIBRARY_DIR TAO_LIBRARIES)
+  mark_as_advanced(ACE_LIBRARY_DIR)
+
 else()
 
   message(STATUS "  TAO root and/or TAO IDL compiler were not found.")

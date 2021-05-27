@@ -75,7 +75,7 @@ if(ACE_ROOT_DIR)
     file(STRINGS ${ACE_VERSION_HEADER} ACE_TEMP REGEX "^#define ACE_[A-Z]+_VERSION[ \t]+[0-9]+$")
     string(REGEX REPLACE ".*#define ACE_MAJOR_VERSION[ \t]+([0-9]+).*" "\\1" ACE_VERSION_MAJOR ${ACE_TEMP})
     string(REGEX REPLACE ".*#define ACE_MINOR_VERSION[ \t]+([0-9]+).*" "\\1" ACE_VERSION_MINOR ${ACE_TEMP})
-    string(REGEX REPLACE ".*#define ACE_BETA_VERSION[ \t]+([0-9]+).*" "\\1" ACE_VERSION_PATCH ${ACE_TEMP})
+    string(REGEX REPLACE ".*#define ACE_MICRO_VERSION[ \t]+([0-9]+).*" "\\1" ACE_VERSION_PATCH ${ACE_TEMP})
   else()
     message(WARNING "Could not find ACE version header ${ACE_VERSION_HEADER}")
     set(ACE_VERSION_MAJOR X)
@@ -90,6 +90,10 @@ if(ACE_ROOT_DIR)
   # code needs (CLARAty only?)
   #--------------------------------------------------
   #XXX add_definitions(-DUSE_ACE)
+
+  include(FindPackageHandleStandardArgs)
+  find_package_handle_standard_args(ACE DEFAULT_MSG ACE_VERSION ACE_INCLUDE_DIR ACE_LIBRARY_DIR ACE_LIBRARIES)
+  mark_as_advanced(ACE_LIBRARY_DIR)
 
 else()
 

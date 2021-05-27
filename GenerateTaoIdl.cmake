@@ -63,8 +63,8 @@ macro(tao_wrap_idl)
   # newer versions of TAO (ACE version 5.8.1+) default to generating errors
   # for anonymous types. -aw overrides this and makes it a warning
   # Nice of them to add new compiler flags as a "patch" update...
-  if(ACE_VERSION VERSION_GREATER "5.8.0")
-    set(TAO_IDL_VER_FLAGS "-aw -Cw")
+  if(ACE_VERSION VERSION_GREATER 5.8.0)
+    set(TAO_IDL_VER_FLAGS -w -aw -Cw)
   endif()
 
   # -si flag disappeared somewhere before 2.1.2. Use default .inl extensions
@@ -72,8 +72,7 @@ macro(tao_wrap_idl)
   # XXX -GC Generate the AMI classes
   # -in        To generate <>s for standard #include'd files (non-changing files)
   list(APPEND TAO_IDL_FLAGS ${TAO_IDL_VER_FLAGS} -in -Wb,pre_include=ace/pre.h -Wb,post_include=ace/post.h)
-
-  #message( STATUS "TAO_IDL_FLAGS = ${TAO_IDL_FLAGS}" )
+  #message(WARNING "TAO_IDL_FLAGS = ${TAO_IDL_FLAGS}")
 
   # TODO we should to some system introspection to narrow this list down
   set(TAO_IDL_INCLUDES
@@ -86,8 +85,6 @@ macro(tao_wrap_idl)
       ${TAO_IDL_INCLUDES}
   )
 
-  set(SRCDIR ${CMAKE_CURRENT_SOURCE_DIR})
-  set(OOSDIR ${CMAKE_CURRENT_BINARY_DIR})
 
   # add a custom command set for idl files
   #-----------------------------------------------------
@@ -95,6 +92,17 @@ macro(tao_wrap_idl)
 
     # get the basename (i.e. "NAME Without Extension")
     get_filename_component(IDL_BASE ${IDL_FILENAME} NAME_WE)
+    get_filename_component(IDL_DEP_PATH ${IDL_FILENAME} ABSOLUTE)
+    get_filename_component(IDL_SRC_DIR ${IDL_DEP_PATH} DIRECTORY)
+
+    option(IDL_OUTPUT_IN_SOURCE_DIR "" ON)
+    if(IDL_OUTPUT_IN_SOURCE_DIR)
+      set(SRCDIR ${IDL_SRC_DIR})
+      set(OOSDIR ${IDL_SRC_DIR})
+    else()
+      set(SRCDIR ${CMAKE_CURRENT_SOURCE_DIR})
+      set(OOSDIR ${CMAKE_CURRENT_BINARY_DIR})
+    endif()
 
     set(IDL_OUTPUT_HEADERS ${OOSDIR}/${IDL_BASE}${IDL_CHDR} ${OOSDIR}/${IDL_BASE}${IDL_CINL}
                            ${OOSDIR}/${IDL_BASE}${IDL_SHDR}
@@ -102,7 +110,7 @@ macro(tao_wrap_idl)
     # newer versions of TAO don't generate servant inline files
     # not sure what version this happened at, the version
     # below is a guess
-    if(ACE_VERSION VERSION_LESS "6.0.2")
+    if(ACE_VERSION VERSION_LESS 6.0.2)
       set(IDL_OUTPUT_HEADERS ${IDL_OUTPUT_HEADERS} ${OOSDIR}/${IDL_BASE}${IDL_SINL})
     endif()
 
@@ -124,24 +132,24 @@ macro(tao_wrap_idl)
     # output files depend on at least the corresponding idl
     set(DEPEND_FILE_LIST ${SRCDIR}/${IDL_BASE}.idl)
 
-    # load the contents of the idl file
-    file(READ ${IDL_FILENAME} IDL_FILE_CONTENTS)
+    if(NOT IDL_OUTPUT_IN_SOURCE_DIR)
+      file(READ ${IDL_FILENAME} IDL_FILE_CONTENTS LIMIT 1024)
+      # look for other dependencies
+      foreach(IDL_DEP_FULL_FILENAME ${ARGN})
+        get_filename_component(IDL_DEP_BASE ${IDL_DEP_FULL_FILENAME} NAME_WE)
+        if(IDL_FILE_CONTENTS MATCHES ${IDL_DEP_BASE}\\.idl AND NOT IDL_DEP_FULL_FILENAME STREQUAL IDL_FILENAME)
+          message(STATUS "${IDL_DEP_FULL_FILENAME} depends on ${IDL_FILENAME}")
+          #message(WARNING "IDL_FILE_CONTENTS = ${IDL_FILE_CONTENTS}")
+          # Target will need to depend on the output file, not the idl,
+          # so that included included dependencies work correctly.
+          list(APPEND DEPEND_FILE_LIST ${OOSDIR}/${IDL_DEP_BASE}${IDL_CHDR})
+        endif()
+      endforeach()
+    endif()
 
-    # look for other dependencies
-    foreach(IDL_DEP_FULL_FILENAME ${ARGN})
-      get_filename_component(IDL_DEP_BASE ${IDL_DEP_FULL_FILENAME} NAME_WE)
-
-      if(IDL_FILE_CONTENTS MATCHES ${IDL_DEP_BASE}\\.idl AND NOT IDL_DEP_FULL_FILENAME STREQUAL IDL_FILENAME)
-
-        # Target will need to depend on the output file, not the idl,
-        # so that included included dependencies work correctly.
-        set(DEPEND_FILE_LIST ${DEPEND_FILE_LIST} ${OOSDIR}/${IDL_DEP_BASE}${IDL_CHDR})
-
-      endif()
-    endforeach()
-
+    option(DEBUG_IDL_DEPENDENCIES "" OFF)
     if(DEBUG_IDL_DEPENDENCIES)
-      message("${IDL_OUTPUT_FILES} depends on ${DEPEND_FILE_LIST}\n")
+      message(STATUS "${IDL_OUTPUT_FILES} depends on ${DEPEND_FILE_LIST}")
     endif()
 
     #message(STATUS "--------------------------------------")
@@ -158,8 +166,8 @@ macro(tao_wrap_idl)
     add_custom_command(
       OUTPUT ${IDL_OUTPUT_FILES}
       DEPENDS ${DEPEND_FILE_LIST}
-      COMMAND ${TAO_BIN_VAR} ${TAO_LIB_VAR} ${TAO_IDL_COMMAND} ARGS ${TAO_IDL_FLAGS} ${EXTRA_TAO_IDL_ARGS} -I${SRCDIR}
-              ${TAO_IDL_INCLUDES} -o ${OOSDIR} ${SRCDIR}/${IDL_BASE}.idl
+      COMMAND ${TAO_BIN_VAR} ${TAO_LIB_VAR} ${TAO_IDL_COMMAND} ARGS ${TAO_IDL_FLAGS} ${EXTRA_TAO_IDL_ARGS}
+              -I${CMAKE_CURRENT_SOURCE_DIR} ${TAO_IDL_INCLUDES} -o ${OOSDIR} ${IDL_DEP_PATH}
     )
 
     set(TAO_IDL_GENERATED_HEADERS ${IDL_OUTPUT_HEADERS} ${TAO_IDL_GENERATED_HEADERS})
