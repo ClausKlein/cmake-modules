@@ -125,6 +125,7 @@ if(TAO_INCLUDE_DIR
       TAO_DynamicAny
       TAO_DynamicInterface
       TAO_ETCL
+      TAO_IORManip
       TAO_IORTable
       TAO_Messaging
       TAO_PI
@@ -132,6 +133,7 @@ if(TAO_INCLUDE_DIR
       TAO_PortableServer
       TAO_Strategies
       TAO_Svc_Utils
+      TAO_TypeCodeFactory
       TAO_Utils
       TAO_Valuetype
   )

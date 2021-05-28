@@ -21,8 +21,11 @@
 #############################################################
 macro(tao_wrap_idl)
 
-  # in-source files need to see out-of-source files
-  include_directories(${CMAKE_CURRENT_BINARY_DIR})
+  option(IDL_OUTPUT_IN_SOURCE_DIR "" OFF)
+  if(NOT IDL_OUTPUT_IN_SOURCE_DIR)
+    # in-source files need to see out-of-source files
+    include_directories(${CMAKE_CURRENT_BINARY_DIR})
+  endif()
 
   # on unix, set the LD_LIBRARY_PATH explicitly for tao_idl
   # and the PATH so tao_idl can use gperf
@@ -85,7 +88,6 @@ macro(tao_wrap_idl)
       ${TAO_IDL_INCLUDES}
   )
 
-
   # add a custom command set for idl files
   #-----------------------------------------------------
   foreach(IDL_FILENAME ${ARGN})
@@ -95,7 +97,6 @@ macro(tao_wrap_idl)
     get_filename_component(IDL_DEP_PATH ${IDL_FILENAME} ABSOLUTE)
     get_filename_component(IDL_SRC_DIR ${IDL_DEP_PATH} DIRECTORY)
 
-    option(IDL_OUTPUT_IN_SOURCE_DIR "" ON)
     if(IDL_OUTPUT_IN_SOURCE_DIR)
       set(SRCDIR ${IDL_SRC_DIR})
       set(OOSDIR ${IDL_SRC_DIR})
@@ -111,7 +112,8 @@ macro(tao_wrap_idl)
     # not sure what version this happened at, the version
     # below is a guess
     if(ACE_VERSION VERSION_LESS 6.0.2)
-      set(IDL_OUTPUT_HEADERS ${IDL_OUTPUT_HEADERS} ${OOSDIR}/${IDL_BASE}${IDL_SINL})
+      message(FATAL_ERROR "ACE_VERSION: ${ACE_VERSION} VERSION_LESS 6.0.2")
+      list(APPEND IDL_OUTPUT_HEADERS ${OOSDIR}/${IDL_BASE}${IDL_SINL})
     endif()
 
     set(IDL_OUTPUT_SOURCES ${OOSDIR}/${IDL_BASE}${IDL_CSRC} ${OOSDIR}/${IDL_BASE}${IDL_SSRC})
@@ -133,23 +135,26 @@ macro(tao_wrap_idl)
     set(DEPEND_FILE_LIST ${SRCDIR}/${IDL_BASE}.idl)
 
     if(NOT IDL_OUTPUT_IN_SOURCE_DIR)
-      file(READ ${IDL_FILENAME} IDL_FILE_CONTENTS LIMIT 1024)
+      file(READ ${IDL_FILENAME} IDL_FILE_CONTENTS LIMIT 2048)
+      #message(WARNING "IDL_FILE_CONTENTS = ${IDL_FILE_CONTENTS}")
+
       # look for other dependencies
       foreach(IDL_DEP_FULL_FILENAME ${ARGN})
         get_filename_component(IDL_DEP_BASE ${IDL_DEP_FULL_FILENAME} NAME_WE)
         if(IDL_FILE_CONTENTS MATCHES ${IDL_DEP_BASE}\\.idl AND NOT IDL_DEP_FULL_FILENAME STREQUAL IDL_FILENAME)
-          message(STATUS "${IDL_DEP_FULL_FILENAME} depends on ${IDL_FILENAME}")
-          #message(WARNING "IDL_FILE_CONTENTS = ${IDL_FILE_CONTENTS}")
+          message(STATUS "${IDL_FILENAME} depends on ${IDL_DEP_FULL_FILENAME}")
+
           # Target will need to depend on the output file, not the idl,
           # so that included included dependencies work correctly.
           list(APPEND DEPEND_FILE_LIST ${OOSDIR}/${IDL_DEP_BASE}${IDL_CHDR})
+
         endif()
       endforeach()
     endif()
 
     option(DEBUG_IDL_DEPENDENCIES "" OFF)
     if(DEBUG_IDL_DEPENDENCIES)
-      message(STATUS "${IDL_OUTPUT_FILES} depends on ${DEPEND_FILE_LIST}")
+      message(WARNING "${IDL_OUTPUT_FILES} depends on ${DEPEND_FILE_LIST}")
     endif()
 
     #message(STATUS "--------------------------------------")
@@ -170,8 +175,9 @@ macro(tao_wrap_idl)
               -I${CMAKE_CURRENT_SOURCE_DIR} ${TAO_IDL_INCLUDES} -o ${OOSDIR} ${IDL_DEP_PATH}
     )
 
-    set(TAO_IDL_GENERATED_HEADERS ${IDL_OUTPUT_HEADERS} ${TAO_IDL_GENERATED_HEADERS})
-    set(TAO_IDL_GENERATED ${IDL_OUTPUT_FILES} ${TAO_IDL_GENERATED})
+    list(APPEND TAO_IDL_GENERATED_HEADERS ${IDL_OUTPUT_HEADERS})
+    list(APPEND TAO_IDL_GENERATED ${IDL_OUTPUT_FILES})
+
   endforeach()
 
 endmacro()
