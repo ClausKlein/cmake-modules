@@ -75,12 +75,18 @@ macro(get_pkg_library PKG_PREFIX LIBRARY_DIR DEBUG_POSTFIX LIBRARY_NAME GET_DEBU
     ##----------------------
     set(TEMP_VAR "")
 
-    if(${RELEASE_VAR_NAME})
-      set(TEMP_VAR optimized ${${RELEASE_VAR_NAME}})
-    endif()
+    if(${RELEASE_VAR_NAME} AND ${DEBUG_VAR_NAME})
+      if(${RELEASE_VAR_NAME})
+        set(TEMP_VAR optimized ${${RELEASE_VAR_NAME}})
+      endif()
 
-    if(${DEBUG_VAR_NAME})
-      set(TEMP_VAR ${TEMP_VAR} debug ${${DEBUG_VAR_NAME}})
+      if(${DEBUG_VAR_NAME})
+        set(TEMP_VAR ${TEMP_VAR} debug ${${DEBUG_VAR_NAME}})
+      endif()
+    elseif(${RELEASE_VAR_NAME})
+      set(TEMP_VAR ${${RELEASE_VAR_NAME}})
+    elseif(${DEBUG_VAR_NAME})
+      set(TEMP_VAR ${${DEBUG_VAR_NAME}})
     endif()
 
     if(NOT TEMP_VAR)
@@ -138,8 +144,8 @@ macro(get_library_imports PKG_NAME LIBRARY_DIR LIBRARY_NAMES)
 
   set(DEPEND_DIR ${LIBRARY_DIR}/cmake)
   set(DEPEND_FILE ${DEPEND_DIR}/${PKG_NAME}.cmake)
-  #message(STATUS "  (dbg) depend file is ${DEPEND_FILE}")
-  #message(STATUS "  (dbg) LIBRARY_NAMES=${LIBRARY_NAMES}")
+  #message("  (dbg) depend file is ${DEPEND_FILE}")
+  #message("  (dbg) LIBRARY_NAMES=${LIBRARY_NAMES}")
 
   if(EXISTS ${DEPEND_FILE})
     message(STATUS "  importing ${PKG_NAME} dependency info from ${DEPEND_FILE}")
@@ -150,7 +156,7 @@ macro(get_library_imports PKG_NAME LIBRARY_DIR LIBRARY_NAMES)
     set(${PKG_PREFIX}_LIBRARIES "")
 
     foreach(LIBRARY_NAME ${LIBRARY_NAMES})
-      #message(STATUS "  (dbg) check ${PKG_PREFIX}_${LIBRARY_NAME}_LIBRARY = ${${PKG_PREFIX}_${LIBRARY_NAME}_LIBRARY}")
+      #message("  (dbg) check ${PKG_PREFIX}_${LIBRARY_NAME}_LIBRARY = ${${PKG_PREFIX}_${LIBRARY_NAME}_LIBRARY}")
 
       # if the library was found, change the value to target name instead of lib path
       if(${PKG_PREFIX}_${LIBRARY_NAME}_LIBRARY)
@@ -158,7 +164,7 @@ macro(get_library_imports PKG_NAME LIBRARY_DIR LIBRARY_NAMES)
         set(${PKG_PREFIX}_LIBRARIES ${${PKG_PREFIX}_LIBRARIES} ${LIBRARY_NAME})
       endif()
 
-      #message(STATUS "  -- check ${PKG_PREFIX}_${LIBRARY_NAME}_LIBRARY = ${${PKG_PREFIX}_${LIBRARY_NAME}_LIBRARY}")
+      #message("  (dbg) check ${PKG_PREFIX}_${LIBRARY_NAME}_LIBRARY = ${${PKG_PREFIX}_${LIBRARY_NAME}_LIBRARY}")
 
     endforeach()
 

@@ -26,11 +26,8 @@ include(GetLibraryList)
 
 message(STATUS "Looking for TAO")
 
-# if ACE_FOUND is not set, bail.
-#--------------------------------------------------
 if(NOT ACE_FOUND)
   find_package(ACE REQUIRED)
-  #XXX message(SEND_ERROR "  ACE not found. The FindACE script must complete successfully before calling FindTAO")
 endif()
 
 # include the idl generation macro in the Find
@@ -142,10 +139,10 @@ if(TAO_INCLUDE_DIR
 
   set(TAO_MISSING_LIBRARIES "")
 
-  get_library_list(TAO ${TAO_LIBRARY_DIR} "d" "${TAO_LIBRARY_NAMES}")
+  get_library_list(TAO ${TAO_LIBRARY_DIR} "d" "${TAO_LIBRARY_NAMES}" ON)
 
   if(TAO_MISSING_LIBRARIES)
-    message(WARNING "Not all TAO libraries were found! Missing libraries:\n    ${TAO_MISSING_LIBRARIES}\n")
+    #XXX message(WARNING "Not all TAO libraries were found! Missing libraries:\n    ${TAO_MISSING_LIBRARIES}\n")
   endif()
 
   # Find TAO version by looking at Version.h
@@ -162,15 +159,13 @@ if(TAO_INCLUDE_DIR
     string(REGEX REPLACE ".*#define TAO_MAJOR_VERSION[ \t]+([0-9]+).*" "\\1" TAO_VERSION_MAJOR ${TAO_TEMP})
     string(REGEX REPLACE ".*#define TAO_MINOR_VERSION[ \t]+([0-9]+).*" "\\1" TAO_VERSION_MINOR ${TAO_TEMP})
     string(REGEX REPLACE ".*#define TAO_MICRO_VERSION[ \t]+([0-9]+).*" "\\1" TAO_VERSION_PATCH ${TAO_TEMP})
+    set(TAO_VERSION ${TAO_VERSION_MAJOR}.${TAO_VERSION_MINOR}.${TAO_VERSION_PATCH})
+    message(STATUS "  Found TAO version ${TAO_VERSION} in ${TAO_ROOT_DIR}")
   else()
     message(WARNING "Could not find TAO version header ${TAO_VERSION_HEADER}")
-    set(TAO_VERSION_MAJOR X)
-    set(TAO_VERSION_MINOR Y)
-    set(TAO_VERSION_PATCH Z)
   endif()
-  set(TAO_VERSION ${TAO_VERSION_MAJOR}.${TAO_VERSION_MINOR}.${TAO_VERSION_PATCH})
-  message(STATUS "  Found TAO version ${TAO_VERSION} in ${TAO_ROOT_DIR}")
-  # message(STATUS "  Found TAO in ${TAO_LIBRARY_DIR}")
+
+  message(STATUS "  Found TAO libs: ${TAO_LIBRARIES}")
 
   include(FindPackageHandleStandardArgs)
   find_package_handle_standard_args(TAO DEFAULT_MSG TAO_VERSION TAO_INCLUDE_DIRS TAO_LIBRARY_DIR TAO_LIBRARIES)

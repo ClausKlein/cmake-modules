@@ -69,13 +69,10 @@ if(ACE_ROOT_DIR)
 
   message(STATUS "  ACE_INCLUDE_DIR:=${ACE_INCLUDE_DIR}")
 
-  get_library_list(ACE ${ACE_LIBRARY_DIR} "d" "ACE")
+  get_library_list(ACE ${ACE_LIBRARY_DIR} "d" "ACE" ON)
 
   if(ACE_MISSING_LIBRARIES)
-    message(WARNING "  !! Not all ACE libraries were found! Missing libraries:\n${ACE_MISSING_LIBRARIES}\n")
-    set(ACE_FOUND FALSE)
-  else()
-    set(ACE_FOUND TRUE)
+    #XXX message(WARNING "  !! Not all ACE libraries were found! Missing libraries:\n${ACE_MISSING_LIBRARIES}\n")
   endif()
 
   # Find ACE version by looking at Version.h
@@ -85,20 +82,13 @@ if(ACE_ROOT_DIR)
     string(REGEX REPLACE ".*#define ACE_MAJOR_VERSION[ \t]+([0-9]+).*" "\\1" ACE_VERSION_MAJOR ${ACE_TEMP})
     string(REGEX REPLACE ".*#define ACE_MINOR_VERSION[ \t]+([0-9]+).*" "\\1" ACE_VERSION_MINOR ${ACE_TEMP})
     string(REGEX REPLACE ".*#define ACE_MICRO_VERSION[ \t]+([0-9]+).*" "\\1" ACE_VERSION_PATCH ${ACE_TEMP})
+    set(ACE_VERSION ${ACE_VERSION_MAJOR}.${ACE_VERSION_MINOR}.${ACE_VERSION_PATCH})
+    message(STATUS "  Found ACE version ${ACE_VERSION} in ${ACE_ROOT_DIR}")
   else()
     message(WARNING "Could not find ACE version header ${ACE_VERSION_HEADER}")
-    set(ACE_VERSION_MAJOR X)
-    set(ACE_VERSION_MINOR Y)
-    set(ACE_VERSION_PATCH Z)
   endif()
 
-  set(ACE_VERSION ${ACE_VERSION_MAJOR}.${ACE_VERSION_MINOR}.${ACE_VERSION_PATCH})
-  message(STATUS "  Found ACE version ${ACE_VERSION} in ${ACE_ROOT_DIR}")
-
-  # Add the USE_ACE definition which some
-  # code needs (CLARAty only?)
-  #--------------------------------------------------
-  #XXX add_definitions(-DUSE_ACE)
+  message(STATUS "  Found ACE libs: ${ACE_LIBRARIES}")
 
   include(FindPackageHandleStandardArgs)
   find_package_handle_standard_args(ACE DEFAULT_MSG ACE_VERSION ACE_INCLUDE_DIR ACE_LIBRARY_DIR ACE_LIBRARIES)
