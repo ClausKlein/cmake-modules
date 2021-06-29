@@ -48,5 +48,4 @@ function(option_requires name desc)
     if(${name} AND (NOT OK))
         message(FATAL_ERROR "${name} enabled but these dependencies were not valid: ${missing}")
     endif()
-
 endfunction()

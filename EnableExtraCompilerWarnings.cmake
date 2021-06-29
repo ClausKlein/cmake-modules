@@ -68,7 +68,6 @@ function(enable_extra_compiler_warnings _target)
             COMPILE_FLAGS
             "${_flags}")
     endif()
-
 endfunction()
 
 function(globally_enable_extra_compiler_warnings)

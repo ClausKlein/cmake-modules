@@ -42,7 +42,8 @@ include(GenerateTaoIdl)
 # look for TAO_ROOT_DIR by searching for orbsvcs directory
 # This is detects a "traditional" TAO build
 #--------------------------------------------------
-find_path(TAO_ROOT_DIR "orbsvcs" ${ACE_ROOT_DIR}/../TAO NO_DEFAULT_PATH DOC "root directory of TAO build")
+find_path(TAO_ROOT_DIR "orbsvcs" ${ACE_ROOT_DIR}/TAO NO_DEFAULT_PATH DOC "root directory of TAO build")
+message(STATUS "  TAO root may be ${TAO_ROOT_DIR}")
 
 # if TAO directory isn't there, we've probably got
 # an autotools build of ACE/TAO
@@ -55,6 +56,7 @@ if(NOT TAO_ROOT_DIR)
         TRUE
         CACHE BOOL "Different include paths are required if ACE/TAO was build with autotools"
     )
+    mark_as_advanced(TAO_WAS_BUILT_WITH_AUTOTOOLS)
     message(STATUS "  TAO appears to have been built using autotools instead of traditional build")
   endif()
 endif()
@@ -105,7 +107,7 @@ if(TAO_INCLUDE_DIR
   # XXX standardize on singular: it has become cmake convention even though it's somewhat misleading
   set(TAO_INCLUDE_DIR ${TAO_INCLUDE_DIRS})
 
-  #message(STATUS "TAO_INCLUDE_DIRS= ${TAO_INCLUDE_DIRS}")
+  message(STATUS "  TAO_INCLUDE_DIRS:=${TAO_INCLUDE_DIRS}")
 
   ## find full paths to all the TAO libraries we need
   ###################################################
@@ -171,11 +173,10 @@ if(TAO_INCLUDE_DIR
   # message(STATUS "  Found TAO in ${TAO_LIBRARY_DIR}")
 
   include(FindPackageHandleStandardArgs)
-  find_package_handle_standard_args(TAO DEFAULT_MSG TAO_VERSION TAO_INCLUDE_DIRS ACE_LIBRARY_DIR TAO_LIBRARIES)
-  mark_as_advanced(ACE_LIBRARY_DIR)
+  find_package_handle_standard_args(TAO DEFAULT_MSG TAO_VERSION TAO_INCLUDE_DIRS TAO_LIBRARY_DIR TAO_LIBRARIES)
 
 else()
 
-  message(STATUS "  TAO root and/or TAO IDL compiler were not found.")
+  message(WARNING "  TAO root and/or TAO IDL compiler were not found.")
 
 endif()

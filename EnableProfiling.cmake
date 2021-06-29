@@ -46,7 +46,6 @@ function(enable_profiling _target)
             COMPILE_FLAGS
             "${_flags}")
     endif()
-
 endfunction()
 
 function(globally_enable_profiling)

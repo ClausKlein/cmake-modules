@@ -32,20 +32,27 @@ get_package_lib_search_path(ACE ACE_wrappers ACE_ROOT_DIR ACE_ROOT)
 
 # look for ACE library
 #-----------------------------------------
-set(TEMP_PATH
-    "NOTFOUND"
-    CACHE PATH "temp_path" FORCE
+find_library(
+  TEMP_PATH
+  NAMES ACE ACED
+  HINTS ${LIB_SEARCH_PATH}
+  NO_DEFAULT_PATH
 )
-mark_as_advanced(TEMP_PATH)
-find_library(TEMP_PATH ACE ${LIB_SEARCH_PATH} NO_DEFAULT_PATH)
 
 # Set the root to 2 directories above library.
 #-----------------------------------------
 string(REGEX REPLACE "/[^/]*/[^/]*$" "" ACE_ROOT_DIR ${TEMP_PATH})
+set(ACE_ROOT_DIR
+    ${ACE_ROOT_DIR}
+    CACHE PATH "root directory of ACE build"
+)
 
 if(ACE_ROOT_DIR)
 
-  set(ACE_LIBRARY_DIR ${ACE_ROOT_DIR}/lib)
+  set(ACE_LIBRARY_DIR
+      ${ACE_ROOT_DIR}/lib
+      CACHE PATH "ACE lib directory"
+  )
 
   # FIXME - do a proper header search
   if(EXISTS ${ACE_ROOT_DIR}/ace/ACE.h)
@@ -59,6 +66,8 @@ if(ACE_ROOT_DIR)
         CACHE PATH "ACE include path"
     )
   endif()
+
+  message(STATUS "  ACE_INCLUDE_DIR:=${ACE_INCLUDE_DIR}")
 
   get_library_list(ACE ${ACE_LIBRARY_DIR} "d" "ACE")
 
@@ -94,9 +103,10 @@ if(ACE_ROOT_DIR)
   include(FindPackageHandleStandardArgs)
   find_package_handle_standard_args(ACE DEFAULT_MSG ACE_VERSION ACE_INCLUDE_DIR ACE_LIBRARY_DIR ACE_LIBRARIES)
   mark_as_advanced(ACE_LIBRARY_DIR)
+  mark_as_advanced(ACE_INCLUDE_DIR)
 
 else()
 
-  message(STATUS ${LIB_SEARCH_ERROR_MESSAGE})
+  message(WARNING ${LIB_SEARCH_ERROR_MESSAGE})
 
 endif()
