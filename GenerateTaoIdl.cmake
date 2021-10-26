@@ -96,13 +96,16 @@ macro(tao_wrap_idl)
     get_filename_component(IDL_BASE ${IDL_FILENAME} NAME_WE)
     get_filename_component(IDL_DEP_PATH ${IDL_FILENAME} ABSOLUTE)
     get_filename_component(IDL_SRC_DIR ${IDL_DEP_PATH} DIRECTORY)
+    file(RELATIVE_PATH IDL_PATH ${CMAKE_CURRENT_SOURCE_DIR} ${IDL_SRC_DIR})
+    #message(WARNING "IDL_PATH=${IDL_PATH}")
 
     if(IDL_OUTPUT_IN_SOURCE_DIR)
       set(SRCDIR ${IDL_SRC_DIR})
       set(OOSDIR ${IDL_SRC_DIR})
-    else()
-      set(SRCDIR ${CMAKE_CURRENT_SOURCE_DIR})
-      set(OOSDIR ${CMAKE_CURRENT_BINARY_DIR})
+    else() # NOTE: OutOffSource Directory used! CK
+      set(SRCDIR ${IDL_SRC_DIR})
+      set(OOSDIR ${CMAKE_CURRENT_BINARY_DIR}/${IDL_PATH})
+      #message(WARNING "OOSDIR=${OOSDIR}")
     endif()
 
     set(IDL_OUTPUT_HEADERS ${OOSDIR}/${IDL_BASE}${IDL_CHDR} ${OOSDIR}/${IDL_BASE}${IDL_CINL}
@@ -134,37 +137,29 @@ macro(tao_wrap_idl)
     # output files depend on at least the corresponding idl
     set(DEPEND_FILE_LIST ${SRCDIR}/${IDL_BASE}.idl)
 
-    if(NOT IDL_OUTPUT_IN_SOURCE_DIR)
-      file(READ ${IDL_FILENAME} IDL_FILE_CONTENTS LIMIT 2048)
-      #message(WARNING "IDL_FILE_CONTENTS = ${IDL_FILE_CONTENTS}")
+    file(READ ${IDL_FILENAME} IDL_FILE_CONTENTS LIMIT 2048)
+    #message(WARNING "IDL_FILE_CONTENTS = ${IDL_FILE_CONTENTS}")
 
-      # look for other dependencies
-      foreach(IDL_DEP_FULL_FILENAME ${ARGN})
-        get_filename_component(IDL_DEP_BASE ${IDL_DEP_FULL_FILENAME} NAME_WE)
-        if(IDL_FILE_CONTENTS MATCHES ${IDL_DEP_BASE}\\.idl AND NOT IDL_DEP_FULL_FILENAME STREQUAL IDL_FILENAME)
-          message(STATUS "${IDL_FILENAME} depends on ${IDL_DEP_FULL_FILENAME}")
+    # look for other dependencies
+    foreach(IDL_DEP_FULL_FILENAME ${ARGN})
+      get_filename_component(IDL_DEP_BASE ${IDL_DEP_FULL_FILENAME} NAME_WE)
+      if(IDL_FILE_CONTENTS MATCHES ${IDL_DEP_BASE}\\.idl AND NOT IDL_DEP_FULL_FILENAME STREQUAL IDL_FILENAME)
+        #message(STATUS "${IDL_FILENAME} depends on ${IDL_DEP_FULL_FILENAME}")
+        list(APPEND DEPEND_FILE_LIST ${IDL_DEP_FULL_FILENAME})
+      endif()
+    endforeach()
 
-          # Target will need to depend on the output file, not the idl,
-          # so that included included dependencies work correctly.
-          list(APPEND DEPEND_FILE_LIST ${OOSDIR}/${IDL_DEP_BASE}${IDL_CHDR})
-
-        endif()
-      endforeach()
+    option(IDL_DEBUG_DEPENDENCIES "" OFF)
+    if(IDL_DEBUG_DEPENDENCIES)
+      message(STATUS "--------------------------------------")
+      message(STATUS "  IDL_OUTPUT_FILES=${IDL_OUTPUT_FILES}")
+      message(STATUS "  DEPEND_FILE_LIST=${DEPEND_FILE_LIST}")
+      message(STATUS "       TAO_BIN_VAR=${TAO_BIN_VAR}")
+      message(STATUS "       TAO_LIB_VAR=${TAO_LIB_VAR}")
+      message(STATUS "   TAO_IDL_COMMAND=${TAO_IDL_COMMAND}")
+      message(STATUS "     TAO_IDL_FLAGS=${TAO_IDL_FLAGS}")
+      message(STATUS "EXTRA_TAO_IDL_ARGS=${EXTRA_TAO_IDL_ARGS}")
     endif()
-
-    option(DEBUG_IDL_DEPENDENCIES "" OFF)
-    if(DEBUG_IDL_DEPENDENCIES)
-      message(WARNING "${IDL_OUTPUT_FILES} depends on ${DEPEND_FILE_LIST}")
-    endif()
-
-    #message(STATUS "--------------------------------------")
-    #message(STATUS "  IDL_OUTPUT_FILES=${IDL_OUTPUT_FILES}")
-    #message(STATUS "  DEPEND_FILE_LIST=${DEPEND_FILE_LIST}")
-    #message(STATUS "       TAO_BIN_VAR=${TAO_BIN_VAR}")
-    #message(STATUS "       TAO_LIB_VAR=${TAO_LIB_VAR}")
-    #message(STATUS "   TAO_IDL_COMMAND=${TAO_IDL_COMMAND}")
-    #message(STATUS "     TAO_IDL_FLAGS=${TAO_IDL_FLAGS}")
-    #message(STATUS "EXTRA_TAO_IDL_ARGS=${EXTRA_TAO_IDL_ARGS}")
 
     # setup the command
     #-----------------------------------------------------
