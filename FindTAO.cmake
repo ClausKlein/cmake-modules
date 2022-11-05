@@ -49,9 +49,8 @@ if(NOT TAO_ROOT_DIR)
   find_path(TAO_ROOT_DIR "include/orbsvcs" ${ACE_ROOT_DIR} NO_DEFAULT_PATH DOC "root directory of TAO build")
   if(TAO_ROOT_DIR)
     # we have to cache this value because TAO_ROOT_DIR is cached
-    set(TAO_WAS_BUILT_WITH_AUTOTOOLS
-        TRUE
-        CACHE BOOL "Different include paths are required if ACE/TAO was build with autotools"
+    set(TAO_WAS_BUILT_WITH_AUTOTOOLS TRUE CACHE BOOL
+                                                "Different include paths are required if ACE/TAO was build with autotools"
     )
     mark_as_advanced(TAO_WAS_BUILT_WITH_AUTOTOOLS)
     message(STATUS "  TAO appears to have been built using autotools instead of traditional build")
@@ -82,23 +81,20 @@ endif()
 
 # find the IDL compiler
 #--------------------------------------------------
-find_program(
-  TAO_IDL_COMMAND tao_idl
-  HINTS ${ACE_ROOT_DIR}/bin
-  NO_SYSTEM_ENVIRONMENT_PATH
-)
+find_program(TAO_IDL_COMMAND tao_idl HINTS ${ACE_ROOT_DIR}/bin NO_SYSTEM_ENVIRONMENT_PATH)
 message(STATUS "  TAO_IDL_COMMAND = ${TAO_IDL_COMMAND}")
 
-if(TAO_INCLUDE_DIR
-   AND TAO_LIBRARY_DIR
-   AND TAO_IDL_COMMAND
-)
+if(TAO_INCLUDE_DIR AND TAO_LIBRARY_DIR AND TAO_IDL_COMMAND)
 
   if(TAO_WAS_BUILT_WITH_AUTOTOOLS)
     set(TAO_INCLUDE_DIRS ${TAO_INCLUDE_DIR} ${TAO_INCLUDE_DIR}/tao ${TAO_INCLUDE_DIR}/orbsvcs)
   else()
-    set(TAO_INCLUDE_DIRS ${ACE_INCLUDE_DIR} ${TAO_INCLUDE_DIR} ${TAO_INCLUDE_DIR}/tao ${TAO_INCLUDE_DIR}/orbsvcs
-                         ${TAO_INCLUDE_DIR}/orbsvcs/orbsvcs
+    set(TAO_INCLUDE_DIRS
+        ${ACE_INCLUDE_DIR}
+        ${TAO_INCLUDE_DIR}
+        ${TAO_INCLUDE_DIR}/tao
+        ${TAO_INCLUDE_DIR}/orbsvcs
+        ${TAO_INCLUDE_DIR}/orbsvcs/orbsvcs
     )
   endif()
   # XXX standardize on singular: it has become cmake convention even though it's somewhat misleading
@@ -139,7 +135,13 @@ if(TAO_INCLUDE_DIR
 
   set(TAO_MISSING_LIBRARIES "")
 
-  get_library_list(TAO ${TAO_LIBRARY_DIR} "d" "${TAO_LIBRARY_NAMES}" ON)
+  get_library_list(
+    TAO
+    ${TAO_LIBRARY_DIR}
+    "d"
+    "${TAO_LIBRARY_NAMES}"
+    ON
+  )
 
   if(TAO_MISSING_LIBRARIES)
     #XXX message(WARNING "Not all TAO libraries were found! Missing libraries:\n    ${TAO_MISSING_LIBRARIES}\n")
@@ -168,7 +170,14 @@ if(TAO_INCLUDE_DIR
   message(STATUS "  Found TAO libs: ${TAO_LIBRARIES}")
 
   include(FindPackageHandleStandardArgs)
-  find_package_handle_standard_args(TAO DEFAULT_MSG TAO_VERSION TAO_INCLUDE_DIRS TAO_LIBRARY_DIR TAO_LIBRARIES)
+  find_package_handle_standard_args(
+    TAO
+    DEFAULT_MSG
+    TAO_VERSION
+    TAO_INCLUDE_DIRS
+    TAO_LIBRARY_DIR
+    TAO_LIBRARIES
+  )
 
 else()
 

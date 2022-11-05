@@ -10,15 +10,9 @@ include_guard(DIRECTORY)
 # ---------------------------------------------------------------------------
 find_program(CCACHE_EXECUTABLE "ccache" HINTS /usr/local/bin /opt/local/bin)
 if(CCACHE_EXECUTABLE)
-    message(STATUS "use ccache")
-    set(CMAKE_CXX_COMPILER_LAUNCHER
-        "${CCACHE_EXECUTABLE}"
-        CACHE PATH "ccache" FORCE
-    )
-    set(CMAKE_C_COMPILER_LAUNCHER
-        "${CCACHE_EXECUTABLE}"
-        CACHE PATH "ccache" FORCE
-    )
+  message(STATUS "use ccache")
+  set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_EXECUTABLE}" CACHE PATH "ccache" FORCE)
+  set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_EXECUTABLE}" CACHE PATH "ccache" FORCE)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})

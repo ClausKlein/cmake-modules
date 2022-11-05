@@ -74,7 +74,13 @@ macro(tao_wrap_idl)
   # NO! -ci ${IDL_CINL} -si ${IDL_SINL}
   # XXX -GC Generate the AMI classes
   # -in        To generate <>s for standard #include'd files (non-changing files)
-  list(APPEND TAO_IDL_FLAGS ${TAO_IDL_VER_FLAGS} -in -Wb,pre_include=ace/pre.h -Wb,post_include=ace/post.h)
+  list(APPEND
+       TAO_IDL_FLAGS
+       ${TAO_IDL_VER_FLAGS}
+       -in
+       -Wb,pre_include=ace/pre.h
+       -Wb,post_include=ace/post.h
+  )
   #message(WARNING "TAO_IDL_FLAGS = ${TAO_IDL_FLAGS}")
 
   # TODO we should to some system introspection to narrow this list down
@@ -164,8 +170,7 @@ macro(tao_wrap_idl)
     # setup the command
     #-----------------------------------------------------
     add_custom_command(
-      OUTPUT ${IDL_OUTPUT_FILES}
-      DEPENDS ${DEPEND_FILE_LIST}
+      OUTPUT ${IDL_OUTPUT_FILES} DEPENDS ${DEPEND_FILE_LIST}
       COMMAND ${TAO_BIN_VAR} ${TAO_LIB_VAR} ${TAO_IDL_COMMAND} ARGS ${TAO_IDL_FLAGS} ${EXTRA_TAO_IDL_ARGS}
               -I${CMAKE_CURRENT_SOURCE_DIR} ${TAO_IDL_INCLUDES} -o ${OOSDIR} ${IDL_DEP_PATH}
     )

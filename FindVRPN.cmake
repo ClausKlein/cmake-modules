@@ -26,62 +26,51 @@
 # (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 
-set(VRPN_ROOT_DIR
-	"${VRPN_ROOT_DIR}"
-	CACHE
-	PATH
-	"Root directory to search for VRPN")
+set(VRPN_ROOT_DIR "${VRPN_ROOT_DIR}" CACHE PATH "Root directory to search for VRPN")
 
 if("${CMAKE_SIZEOF_VOID_P}" MATCHES "8")
-	set(_libsuffixes lib64 lib)
+  set(_libsuffixes lib64 lib)
 
-	# 64-bit dir: only set on win64
-	file(TO_CMAKE_PATH "$ENV{ProgramW6432}" _progfiles)
+  # 64-bit dir: only set on win64
+  file(TO_CMAKE_PATH "$ENV{ProgramW6432}" _progfiles)
 else()
-	set(_libsuffixes lib)
-	if(NOT "$ENV{ProgramFiles(x86)}" STREQUAL "")
-		# 32-bit dir: only set on win64
-		file(TO_CMAKE_PATH "$ENV{ProgramFiles(x86)}" _progfiles)
-	else()
-		# 32-bit dir on win32, useless to us on win64
-		file(TO_CMAKE_PATH "$ENV{ProgramFiles}" _progfiles)
-	endif()
+  set(_libsuffixes lib)
+  if(NOT "$ENV{ProgramFiles(x86)}" STREQUAL "")
+    # 32-bit dir: only set on win64
+    file(TO_CMAKE_PATH "$ENV{ProgramFiles(x86)}" _progfiles)
+  else()
+    # 32-bit dir on win32, useless to us on win64
+    file(TO_CMAKE_PATH "$ENV{ProgramFiles}" _progfiles)
+  endif()
 endif()
 
 ###
 # Configure VRPN
 ###
 
-find_path(VRPN_INCLUDE_DIR
-	NAMES
-	vrpn_Connection.h
-	PATH_SUFFIXES
-	include
-	include/vrpn
-	HINTS
-	"${VRPN_ROOT_DIR}"
-	PATHS
-	"${_progfiles}/VRPN")
+find_path(
+  VRPN_INCLUDE_DIR
+  NAMES vrpn_Connection.h
+  PATH_SUFFIXES include include/vrpn
+  HINTS "${VRPN_ROOT_DIR}"
+  PATHS "${_progfiles}/VRPN"
+)
 
-find_library(VRPN_LIBRARY
-	NAMES
-	vrpn
-	PATH_SUFFIXES
-	${_libsuffixes}
-	HINTS
-	"${VRPN_ROOT_DIR}"
-	PATHS
-	"${_progfiles}/VRPN")
+find_library(
+  VRPN_LIBRARY
+  NAMES vrpn
+  PATH_SUFFIXES ${_libsuffixes}
+  HINTS "${VRPN_ROOT_DIR}"
+  PATHS "${_progfiles}/VRPN"
+)
 
-find_library(VRPN_SERVER_LIBRARY
-	NAMES
-	vrpnserver
-	PATH_SUFFIXES
-	${_libsuffixes}
-	HINTS
-	"${VRPN_ROOT_DIR}"
-	PATHS
-	"${_progfiles}/VRPN")
+find_library(
+  VRPN_SERVER_LIBRARY
+  NAMES vrpnserver
+  PATH_SUFFIXES ${_libsuffixes}
+  HINTS "${VRPN_ROOT_DIR}"
+  PATHS "${_progfiles}/VRPN"
+)
 
 ###
 # Dependencies
@@ -96,29 +85,28 @@ list(APPEND _deps_includes ${QUATLIB_INCLUDE_DIRS})
 list(APPEND _deps_check QUATLIB_FOUND)
 
 if(NOT WIN32)
-	find_package(Threads)
-	list(APPEND _deps_libs ${CMAKE_THREAD_LIBS_INIT})
-	list(APPEND _deps_check CMAKE_HAVE_THREADS_LIBRARY)
+  find_package(Threads)
+  list(APPEND _deps_libs ${CMAKE_THREAD_LIBS_INIT})
+  list(APPEND _deps_check CMAKE_HAVE_THREADS_LIBRARY)
 endif()
-
 
 # handle the QUIETLY and REQUIRED arguments and set xxx_FOUND to TRUE if
 # all listed variables are TRUE
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(VRPN
-	DEFAULT_MSG
-	VRPN_LIBRARY
-	VRPN_INCLUDE_DIR
-	${_deps_check})
+find_package_handle_standard_args(
+  VRPN
+  DEFAULT_MSG
+  VRPN_LIBRARY
+  VRPN_INCLUDE_DIR
+  ${_deps_check}
+)
 
 if(VRPN_FOUND)
-	set(VRPN_INCLUDE_DIRS "${VRPN_INCLUDE_DIR}" ${_deps_includes})
-	set(VRPN_LIBRARIES "${VRPN_LIBRARY}" ${_deps_libs})
-	set(VRPN_SERVER_LIBRARIES "${VRPN_SERVER_LIBRARY}" ${_deps_libs})
+  set(VRPN_INCLUDE_DIRS "${VRPN_INCLUDE_DIR}" ${_deps_includes})
+  set(VRPN_LIBRARIES "${VRPN_LIBRARY}" ${_deps_libs})
+  set(VRPN_SERVER_LIBRARIES "${VRPN_SERVER_LIBRARY}" ${_deps_libs})
 
-	mark_as_advanced(VRPN_ROOT_DIR)
+  mark_as_advanced(VRPN_ROOT_DIR)
 endif()
 
-mark_as_advanced(VRPN_LIBRARY
-	VRPN_SERVER_LIBRARY
-	VRPN_INCLUDE_DIR)
+mark_as_advanced(VRPN_LIBRARY VRPN_SERVER_LIBRARY VRPN_INCLUDE_DIR)

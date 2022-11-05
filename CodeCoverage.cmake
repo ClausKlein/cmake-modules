@@ -158,10 +158,7 @@ elseif(NOT CMAKE_COMPILER_IS_GNUCXX)
   endif()
 endif()
 
-set(COVERAGE_COMPILER_FLAGS
-    "-g -fprofile-arcs -ftest-coverage"
-    CACHE INTERNAL ""
-)
+set(COVERAGE_COMPILER_FLAGS "-g -fprofile-arcs -ftest-coverage" CACHE INTERNAL "")
 if(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang)")
   include(CheckCXXCompilerFlag)
   check_cxx_compiler_flag(-fprofile-abs-path HAVE_fprofile_abs_path)
@@ -170,28 +167,24 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang)")
   endif()
 endif()
 
-set(CMAKE_Fortran_FLAGS_COVERAGE
-    ${COVERAGE_COMPILER_FLAGS}
+set(CMAKE_Fortran_FLAGS_COVERAGE ${COVERAGE_COMPILER_FLAGS}
     CACHE STRING "Flags used by the Fortran compiler during coverage builds." FORCE
 )
-set(CMAKE_CXX_FLAGS_COVERAGE
-    ${COVERAGE_COMPILER_FLAGS}
+set(CMAKE_CXX_FLAGS_COVERAGE ${COVERAGE_COMPILER_FLAGS}
     CACHE STRING "Flags used by the C++ compiler during coverage builds." FORCE
 )
-set(CMAKE_C_FLAGS_COVERAGE
-    ${COVERAGE_COMPILER_FLAGS}
-    CACHE STRING "Flags used by the C compiler during coverage builds." FORCE
+set(CMAKE_C_FLAGS_COVERAGE ${COVERAGE_COMPILER_FLAGS} CACHE STRING "Flags used by the C compiler during coverage builds."
+                                                            FORCE
 )
-set(CMAKE_EXE_LINKER_FLAGS_COVERAGE
-    ""
-    CACHE STRING "Flags used for linking binaries during coverage builds." FORCE
-)
-set(CMAKE_SHARED_LINKER_FLAGS_COVERAGE
-    ""
-    CACHE STRING "Flags used by the shared libraries linker during coverage builds." FORCE
+set(CMAKE_EXE_LINKER_FLAGS_COVERAGE "" CACHE STRING "Flags used for linking binaries during coverage builds." FORCE)
+set(CMAKE_SHARED_LINKER_FLAGS_COVERAGE "" CACHE STRING "Flags used by the shared libraries linker during coverage builds."
+                                                FORCE
 )
 mark_as_advanced(
-  CMAKE_Fortran_FLAGS_COVERAGE CMAKE_CXX_FLAGS_COVERAGE CMAKE_C_FLAGS_COVERAGE CMAKE_EXE_LINKER_FLAGS_COVERAGE
+  CMAKE_Fortran_FLAGS_COVERAGE
+  CMAKE_CXX_FLAGS_COVERAGE
+  CMAKE_C_FLAGS_COVERAGE
+  CMAKE_EXE_LINKER_FLAGS_COVERAGE
   CMAKE_SHARED_LINKER_FLAGS_COVERAGE
 )
 
@@ -224,8 +217,21 @@ function(setup_target_for_coverage_lcov)
 
   set(options NO_DEMANGLE)
   set(oneValueArgs BASE_DIRECTORY NAME)
-  set(multiValueArgs EXCLUDE EXECUTABLE EXECUTABLE_ARGS DEPENDENCIES LCOV_ARGS GENHTML_ARGS)
-  cmake_parse_arguments(Coverage "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  set(multiValueArgs
+      EXCLUDE
+      EXECUTABLE
+      EXECUTABLE_ARGS
+      DEPENDENCIES
+      LCOV_ARGS
+      GENHTML_ARGS
+  )
+  cmake_parse_arguments(
+    Coverage
+    "${options}"
+    "${oneValueArgs}"
+    "${multiValueArgs}"
+    ${ARGN}
+  )
 
   if(NOT LCOV_PATH)
     message(FATAL_ERROR "lcov not found! Aborting...")
@@ -246,7 +252,13 @@ function(setup_target_for_coverage_lcov)
   set(LCOV_EXCLUDES "")
   foreach(EXCLUDE ${Coverage_EXCLUDE} ${COVERAGE_EXCLUDES} ${COVERAGE_LCOV_EXCLUDES})
     if(CMAKE_VERSION VERSION_GREATER 3.4)
-      get_filename_component(EXCLUDE ${EXCLUDE} ABSOLUTE BASE_DIR ${BASEDIR})
+      get_filename_component(
+        EXCLUDE
+        ${EXCLUDE}
+        ABSOLUTE
+        BASE_DIR
+        ${BASEDIR}
+      )
     endif()
     list(APPEND LCOV_EXCLUDES "${EXCLUDE}")
   endforeach()
@@ -328,8 +340,13 @@ function(setup_target_for_coverage_lcov)
   )
   # Generate HTML output
   set(Coverage_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/generated)
-  set(LCOV_GEN_HTML_CMD ${GENHTML_PATH} ${GENHTML_EXTRA_ARGS} ${Coverage_GENHTML_ARGS} -o
-                        ${Coverage_OUTPUT_DIR}/${Coverage_NAME} ${Coverage_NAME}.info
+  set(LCOV_GEN_HTML_CMD
+      ${GENHTML_PATH}
+      ${GENHTML_EXTRA_ARGS}
+      ${Coverage_GENHTML_ARGS}
+      -o
+      ${Coverage_OUTPUT_DIR}/${Coverage_NAME}
+      ${Coverage_NAME}.info
   )
 
   if(CODE_COVERAGE_VERBOSE)
@@ -374,7 +391,10 @@ function(setup_target_for_coverage_lcov)
     COMMAND ${LCOV_FILTER_CMD}
     COMMAND ${LCOV_GEN_HTML_CMD}
     # Set output files as GENERATED (will be removed on 'make clean')
-    BYPRODUCTS ${Coverage_NAME}.base ${Coverage_NAME}.capture ${Coverage_NAME}.total ${Coverage_NAME}.info
+    BYPRODUCTS ${Coverage_NAME}.base
+               ${Coverage_NAME}.capture
+               ${Coverage_NAME}.total
+               ${Coverage_NAME}.info
                ${Coverage_OUTPUT_DIR}/${Coverage_NAME}/index.html
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
     DEPENDS ${Coverage_DEPENDENCIES}
@@ -384,17 +404,12 @@ function(setup_target_for_coverage_lcov)
 
   # Show where to find the lcov info report
   add_custom_command(
-    TARGET ${Coverage_NAME}
-    POST_BUILD
-    COMMAND ;
-    COMMENT "Lcov code coverage info report saved in ${Coverage_NAME}.info."
+    TARGET ${Coverage_NAME} POST_BUILD COMMAND ; COMMENT "Lcov code coverage info report saved in ${Coverage_NAME}.info."
   )
 
   # Show info where to find the report
   add_custom_command(
-    TARGET ${Coverage_NAME}
-    POST_BUILD
-    COMMAND ;
+    TARGET ${Coverage_NAME} POST_BUILD COMMAND ;
     COMMENT "Open ${Coverage_OUTPUT_DIR}/${Coverage_NAME}/index.html in your browser to view the coverage report."
   )
 
@@ -421,7 +436,13 @@ function(setup_target_for_coverage_gcovr_xml)
   set(options NONE)
   set(oneValueArgs BASE_DIRECTORY NAME)
   set(multiValueArgs EXCLUDE EXECUTABLE EXECUTABLE_ARGS DEPENDENCIES)
-  cmake_parse_arguments(Coverage "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  cmake_parse_arguments(
+    Coverage
+    "${options}"
+    "${oneValueArgs}"
+    "${multiValueArgs}"
+    ${ARGN}
+  )
 
   if(NOT GCOVR_PATH)
     message(FATAL_ERROR "gcovr not found! Aborting...")
@@ -438,7 +459,13 @@ function(setup_target_for_coverage_gcovr_xml)
   set(GCOVR_EXCLUDES "")
   foreach(EXCLUDE ${Coverage_EXCLUDE} ${COVERAGE_EXCLUDES} ${COVERAGE_GCOVR_EXCLUDES})
     if(CMAKE_VERSION VERSION_GREATER 3.4)
-      get_filename_component(EXCLUDE ${EXCLUDE} ABSOLUTE BASE_DIR ${BASEDIR})
+      get_filename_component(
+        EXCLUDE
+        ${EXCLUDE}
+        ABSOLUTE
+        BASE_DIR
+        ${BASEDIR}
+      )
     endif()
     list(APPEND GCOVR_EXCLUDES "${EXCLUDE}")
   endforeach()
@@ -492,10 +519,7 @@ function(setup_target_for_coverage_gcovr_xml)
 
   # Show info where to find the report
   add_custom_command(
-    TARGET ${Coverage_NAME}
-    POST_BUILD
-    COMMAND ;
-    COMMENT "Cobertura code coverage report saved in ${Coverage_NAME}.xml."
+    TARGET ${Coverage_NAME} POST_BUILD COMMAND ; COMMENT "Cobertura code coverage report saved in ${Coverage_NAME}.xml."
   )
 endfunction() # setup_target_for_coverage_gcovr_xml
 
@@ -520,7 +544,13 @@ function(setup_target_for_coverage_gcovr_html)
   set(options NONE)
   set(oneValueArgs BASE_DIRECTORY NAME)
   set(multiValueArgs EXCLUDE EXECUTABLE EXECUTABLE_ARGS DEPENDENCIES)
-  cmake_parse_arguments(Coverage "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  cmake_parse_arguments(
+    Coverage
+    "${options}"
+    "${oneValueArgs}"
+    "${multiValueArgs}"
+    ${ARGN}
+  )
 
   if(NOT GCOVR_PATH)
     message(FATAL_ERROR "gcovr not found! Aborting...")
@@ -537,7 +567,13 @@ function(setup_target_for_coverage_gcovr_html)
   set(GCOVR_EXCLUDES "")
   foreach(EXCLUDE ${Coverage_EXCLUDE} ${COVERAGE_EXCLUDES} ${COVERAGE_GCOVR_EXCLUDES})
     if(CMAKE_VERSION VERSION_GREATER 3.4)
-      get_filename_component(EXCLUDE ${EXCLUDE} ABSOLUTE BASE_DIR ${BASEDIR})
+      get_filename_component(
+        EXCLUDE
+        ${EXCLUDE}
+        ABSOLUTE
+        BASE_DIR
+        ${BASEDIR}
+      )
     endif()
     list(APPEND GCOVR_EXCLUDES "${EXCLUDE}")
   endforeach()
@@ -599,9 +635,7 @@ function(setup_target_for_coverage_gcovr_html)
 
   # Show info where to find the report
   add_custom_command(
-    TARGET ${Coverage_NAME}
-    POST_BUILD
-    COMMAND ;
+    TARGET ${Coverage_NAME} POST_BUILD COMMAND ;
     COMMENT "Open ./${Coverage_NAME}/index.html in your browser to view the coverage report."
   )
 
@@ -627,8 +661,21 @@ function(setup_target_for_coverage_fastcov)
 
   set(options NO_DEMANGLE SKIP_HTML)
   set(oneValueArgs BASE_DIRECTORY NAME)
-  set(multiValueArgs EXCLUDE EXECUTABLE EXECUTABLE_ARGS DEPENDENCIES FASTCOV_ARGS GENHTML_ARGS)
-  cmake_parse_arguments(Coverage "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  set(multiValueArgs
+      EXCLUDE
+      EXECUTABLE
+      EXECUTABLE_ARGS
+      DEPENDENCIES
+      FASTCOV_ARGS
+      GENHTML_ARGS
+  )
+  cmake_parse_arguments(
+    Coverage
+    "${options}"
+    "${oneValueArgs}"
+    "${multiValueArgs}"
+    ${ARGN}
+  )
 
   if(NOT FASTCOV_PATH)
     message(FATAL_ERROR "fastcov not found! Aborting...")
@@ -680,8 +727,13 @@ function(setup_target_for_coverage_fastcov)
   if(Coverage_SKIP_HTML)
     set(FASTCOV_HTML_CMD ";")
   else()
-    set(FASTCOV_HTML_CMD ${GENHTML_PATH} ${GENHTML_EXTRA_ARGS} ${Coverage_GENHTML_ARGS} -o ${Coverage_NAME}
-                         ${Coverage_NAME}.info
+    set(FASTCOV_HTML_CMD
+        ${GENHTML_PATH}
+        ${GENHTML_EXTRA_ARGS}
+        ${Coverage_GENHTML_ARGS}
+        -o
+        ${Coverage_NAME}
+        ${Coverage_NAME}.info
     )
   endif()
 
@@ -726,26 +778,13 @@ function(setup_target_for_coverage_fastcov)
     )
   endif()
   # Show where to find the fastcov info report
-  add_custom_command(
-    TARGET ${Coverage_NAME}
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E echo ${INFO_MSG}
-  )
+  add_custom_command(TARGET ${Coverage_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E echo ${INFO_MSG})
 
 endfunction() # setup_target_for_coverage_fastcov
 
 function(append_coverage_compiler_flags)
-  set(CMAKE_C_FLAGS
-      "${CMAKE_C_FLAGS} ${COVERAGE_COMPILER_FLAGS}"
-      PARENT_SCOPE
-  )
-  set(CMAKE_CXX_FLAGS
-      "${CMAKE_CXX_FLAGS} ${COVERAGE_COMPILER_FLAGS}"
-      PARENT_SCOPE
-  )
-  set(CMAKE_Fortran_FLAGS
-      "${CMAKE_Fortran_FLAGS} ${COVERAGE_COMPILER_FLAGS}"
-      PARENT_SCOPE
-  )
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COVERAGE_COMPILER_FLAGS}" PARENT_SCOPE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COVERAGE_COMPILER_FLAGS}" PARENT_SCOPE)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${COVERAGE_COMPILER_FLAGS}" PARENT_SCOPE)
   message(STATUS "Appending code coverage compiler flags: ${COVERAGE_COMPILER_FLAGS}")
 endfunction() # append_coverage_compiler_flags

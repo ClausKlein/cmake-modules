@@ -32,44 +32,33 @@ get_package_lib_search_path(ACE ACE_wrappers ACE_ROOT_DIR ACE_ROOT)
 
 # look for ACE library
 #-----------------------------------------
-find_library(
-  TEMP_PATH
-  NAMES ACE ACED
-  HINTS ${LIB_SEARCH_PATH}
-  NO_DEFAULT_PATH
-)
+find_library(TEMP_PATH NAMES ACE ACED HINTS ${LIB_SEARCH_PATH} NO_DEFAULT_PATH)
 
 # Set the root to 2 directories above library.
 #-----------------------------------------
 string(REGEX REPLACE "/[^/]*/[^/]*$" "" ACE_ROOT_DIR ${TEMP_PATH})
-set(ACE_ROOT_DIR
-    ${ACE_ROOT_DIR}
-    CACHE PATH "root directory of ACE build"
-)
+set(ACE_ROOT_DIR ${ACE_ROOT_DIR} CACHE PATH "root directory of ACE build")
 
 if(ACE_ROOT_DIR)
 
-  set(ACE_LIBRARY_DIR
-      ${ACE_ROOT_DIR}/lib
-      CACHE PATH "ACE lib directory"
-  )
+  set(ACE_LIBRARY_DIR ${ACE_ROOT_DIR}/lib CACHE PATH "ACE lib directory")
 
   # FIXME - do a proper header search
   if(EXISTS ${ACE_ROOT_DIR}/ace/ACE.h)
-    set(ACE_INCLUDE_DIR
-        ${ACE_ROOT_DIR}
-        CACHE PATH "ACE include path"
-    )
+    set(ACE_INCLUDE_DIR ${ACE_ROOT_DIR} CACHE PATH "ACE include path")
   elseif(EXISTS ${ACE_ROOT_DIR}/include/ace/ACE.h)
-    set(ACE_INCLUDE_DIR
-        ${ACE_ROOT_DIR}/include
-        CACHE PATH "ACE include path"
-    )
+    set(ACE_INCLUDE_DIR ${ACE_ROOT_DIR}/include CACHE PATH "ACE include path")
   endif()
 
   message(STATUS "  ACE_INCLUDE_DIR:=${ACE_INCLUDE_DIR}")
 
-  get_library_list(ACE ${ACE_LIBRARY_DIR} "d" "ACE" ON)
+  get_library_list(
+    ACE
+    ${ACE_LIBRARY_DIR}
+    "d"
+    "ACE"
+    ON
+  )
 
   if(ACE_MISSING_LIBRARIES)
     #XXX message(WARNING "  !! Not all ACE libraries were found! Missing libraries:\n${ACE_MISSING_LIBRARIES}\n")
@@ -91,7 +80,14 @@ if(ACE_ROOT_DIR)
   message(STATUS "  Found ACE libs: ${ACE_LIBRARIES}")
 
   include(FindPackageHandleStandardArgs)
-  find_package_handle_standard_args(ACE DEFAULT_MSG ACE_VERSION ACE_INCLUDE_DIR ACE_LIBRARY_DIR ACE_LIBRARIES)
+  find_package_handle_standard_args(
+    ACE
+    DEFAULT_MSG
+    ACE_VERSION
+    ACE_INCLUDE_DIR
+    ACE_LIBRARY_DIR
+    ACE_LIBRARIES
+  )
   mark_as_advanced(ACE_LIBRARY_DIR)
   mark_as_advanced(ACE_INCLUDE_DIR)
 

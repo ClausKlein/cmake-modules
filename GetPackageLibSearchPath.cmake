@@ -61,7 +61,13 @@ macro(get_package_lib_search_path PKG_NAME PKG_DIR_NAME PKG_ROOT_DIR)
     foreach(ONE_DIR_NAME ${PKG_DIR_NAME})
       set(LIB_SEARCH_PATH ${LIB_SEARCH_PATH} ${IRG_PACKAGES_DIR}/${ONE_DIR_NAME}/lib /usr/local/${ONE_DIR_NAME}/lib)
     endforeach()
-    set(LIB_SEARCH_PATH ${LIB_SEARCH_PATH} /usr/local/lib /opt/local/lib /usr/lib /lib)
+    set(LIB_SEARCH_PATH
+        ${LIB_SEARCH_PATH}
+        /usr/local/lib
+        /opt/local/lib
+        /usr/lib
+        /lib
+    )
     foreach(ONE_DIR_NAME ${PKG_DIR_NAME})
       set(LIB_SEARCH_PATH ${LIB_SEARCH_PATH} c:/devel/${ONE_DIR_NAME}/lib)
     endforeach()

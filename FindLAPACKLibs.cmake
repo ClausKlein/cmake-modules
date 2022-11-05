@@ -18,74 +18,44 @@
 
 set(_check)
 
-set(LAPACKLIBS_ROOT_DIR
-	"${LAPACKLIBS_ROOT_DIR}"
-	CACHE
-	PATH
-	"Directory to search for LAPACK libraries")
+set(LAPACKLIBS_ROOT_DIR "${LAPACKLIBS_ROOT_DIR}" CACHE PATH "Directory to search for LAPACK libraries")
 
 if(APPLE)
-	find_library(LAPACKLIBS_VECLIB_FRAMEWORK veclib)
-	find_library(LAPACKLIBS_ACCELERATE_FRAMEWORK accelerate)
-	mark_as_advanced(LAPACKLIBS_VECLIB_FRAMEWORK
-		LAPACKLIBS_ACCELERATE_FRAMEWORK)
+  find_library(LAPACKLIBS_VECLIB_FRAMEWORK veclib)
+  find_library(LAPACKLIBS_ACCELERATE_FRAMEWORK accelerate)
+  mark_as_advanced(LAPACKLIBS_VECLIB_FRAMEWORK LAPACKLIBS_ACCELERATE_FRAMEWORK)
 
-	set(LAPACKLIBS_LIBRARIES
-		"${LAPACKLIBS_VECLIB_FRAMEWORK}"
-		"${LAPACKLIBS_ACCELERATE_FRAMEWORK}")
-	list(APPEND
-		_check
-		LAPACKLIBS_VECLIB_FRAMEWORK
-		LAPACKLIBS_ACCELERATE_FRAMEWORK)
+  set(LAPACKLIBS_LIBRARIES "${LAPACKLIBS_VECLIB_FRAMEWORK}" "${LAPACKLIBS_ACCELERATE_FRAMEWORK}")
+  list(APPEND _check LAPACKLIBS_VECLIB_FRAMEWORK LAPACKLIBS_ACCELERATE_FRAMEWORK)
 elseif(WIN32)
-	# Tested to work with the files from http://www.fi.muni.cz/~xsvobod2/misc/lapack/
-	# You might also see http://icl.cs.utk.edu/lapack-for-windows/clapack/index.html for
-	# the libraries and headers.
+  # Tested to work with the files from http://www.fi.muni.cz/~xsvobod2/misc/lapack/
+  # You might also see http://icl.cs.utk.edu/lapack-for-windows/clapack/index.html for
+  # the libraries and headers.
 
-	# Good luck!
+  # Good luck!
 
-	find_library(LAPACKLIBS_LAPACK_LIBRARY
-		NAMES
-		lapack_win32_MT
-		lapack
-		lapackd
-		HINTS
-		${LAPACKLIBS_ROOT_DIR}
-		PATH_SUFFIXES
-		lapack-MT-release
-		lapack-MT-debug
-		lib)
-	find_library(LAPACKLIBS_BLAS_LIBRARY
-		NAMES
-		blas_win32_MT
-		blas
-		blasd
-		HINTS
-		${LAPACKLIBS_ROOT_DIR}
-		PATH_SUFFIXES
-		lapack-MT-release
-		lapack-MT-debug
-		lib)
-	set(LAPACKLIBS_LIBRARIES
-		"${LAPACKLIBS_LAPACK_LIBRARY}"
-		"${LAPACKLIBS_BLAS_LIBRARY}")
-	list(APPEND _check LAPACKLIBS_LAPACK_LIBRARY LAPACKLIBS_BLAS_LIBRARY)
+  find_library(
+    LAPACKLIBS_LAPACK_LIBRARY NAMES lapack_win32_MT lapack lapackd HINTS ${LAPACKLIBS_ROOT_DIR}
+    PATH_SUFFIXES lapack-MT-release lapack-MT-debug lib
+  )
+  find_library(
+    LAPACKLIBS_BLAS_LIBRARY NAMES blas_win32_MT blas blasd HINTS ${LAPACKLIBS_ROOT_DIR} PATH_SUFFIXES lapack-MT-release
+                                                                                                      lapack-MT-debug lib
+  )
+  set(LAPACKLIBS_LIBRARIES "${LAPACKLIBS_LAPACK_LIBRARY}" "${LAPACKLIBS_BLAS_LIBRARY}")
+  list(APPEND _check LAPACKLIBS_LAPACK_LIBRARY LAPACKLIBS_BLAS_LIBRARY)
 elseif(UNIX)
-	# All other Linux/Unix should have lapack without a fuss
-	list(APPEND _check LAPACKLIBS_LAPACK_LIBRARY)
-	find_library(LAPACKLIBS_LAPACK_LIBRARY lapack)
-	set(LAPACKLIBS_LIBRARIES "${LAPACKLIBS_LAPACK_LIBRARY}")
+  # All other Linux/Unix should have lapack without a fuss
+  list(APPEND _check LAPACKLIBS_LAPACK_LIBRARY)
+  find_library(LAPACKLIBS_LAPACK_LIBRARY lapack)
+  set(LAPACKLIBS_LIBRARIES "${LAPACKLIBS_LAPACK_LIBRARY}")
 endif()
 
 # handle the QUIETLY and REQUIRED arguments and set xxx_FOUND to TRUE if
 # all listed variables are TRUE
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(LAPACKLibs
-	DEFAULT_MSG
-	${_check})
+find_package_handle_standard_args(LAPACKLibs DEFAULT_MSG ${_check})
 
 if(LAPACKLIBS_FOUND)
-	mark_as_advanced(LAPACKLIBS_ROOT_DIR
-		LAPACKLIBS_LAPACK_LIBRARY
-		LAPACKLIBS_BLAS_LIBRARY)
+  mark_as_advanced(LAPACKLIBS_ROOT_DIR LAPACKLIBS_LAPACK_LIBRARY LAPACKLIBS_BLAS_LIBRARY)
 endif()

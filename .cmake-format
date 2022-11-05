@@ -1,77 +1,199 @@
-format:
-  tab_size: 2
-  line_width: 123
-  dangle_parens: true
-
-markup:
-  enable_markup: false
-
 parse:
   additional_commands:
-    cpmaddpackage:
+    _add_boost_lib:
+      kwargs:
+        CXXFLAGS_PRIVATE: '*'
+        DEFINE: '*'
+        DEFINE_PRIVATE: '*'
+        INCLUDE_PRIVATE: '*'
+        LINK: '*'
+        NAME: '1'
+        SOURCES: '*'
+    _add_boost_test:
+      kwargs:
+        DEFINE: '*'
+        LINK: '*'
+        NAME: '1'
+        RUN: '1'
+        TESTS: '*'
+    boost_test:
+      kwargs:
+        ARGUMENTS: '*'
+        LIBRARIES: '*'
+        NAME: '1'
+        PREFIX: '1'
+        SOURCES: '*'
+        TYPE: '1'
+    catch_discover_tests:
+      kwargs:
+        OUTPUT_DIR: 1
+        OUTPUT_PREFIX: 1
+        OUTPUT_SUFFIX: 1
+        REPORTER: 1
+        TEST_PREFIX: 1
       pargs:
-        nargs: '*'
         flags: []
-      spelling: CPMAddPackage
-      kwargs: &cpmaddpackagekwargs
+        nargs: '*'
+    conan_add_remote:
+      kwargs:
+        INDEX: 1
         NAME: 1
-        FORCE: 1
-        VERSION: 1
-        GIT_TAG: 1
+        URL: 1
+      pargs:
+        flags: []
+        nargs: '*'
+    conan_cmake_install:
+      kwargs:
+        BUILD: +
+        ENV: +
+        ENV_BUILD: +
+        ENV_HOST: +
+        GENERATOR: +
+        INSTALL_FOLDER: 1
+        LOCKFILE: 1
+        LOCKFILE_NODE_ID: 1
+        LOCKFILE_OUT: 1
+        OPTIONS: +
+        OPTIONS_BUILD: +
+        OPTIONS_HOST: +
+        PATH_OR_REFERENCE: 1
+        PROFILE: +
+        PROFILE_BUILD: +
+        PROFILE_HOST: +
+        REFERENCE: 1
+        REMOTE: 1
+        SETTINGS: +
+        SETTINGS_BUILD: +
+        SETTINGS_HOST: +
+      pargs:
+        flags: []
+        nargs: '*'
+    cpmaddpackage:
+      kwargs:
+        DOWNLOAD_COMMAND: 1
+        DOWNLOAD_NAME: 1
+        DOWNLOAD_NO_EXTRACT: 1
         DOWNLOAD_ONLY: 1
+        FIND_PACKAGE_ARGUMENTS: 1
+        FORCE: 1
         GITHUB_REPOSITORY: 1
         GITLAB_REPOSITORY: 1
         GIT_REPOSITORY: 1
+        GIT_SHALLOW: 1
+        GIT_TAG: 1
+        HTTP_PASSWORD: 1
+        HTTP_USERNAME: 1
+        NAME: 1
+        NO_CACHE: 1
+        OPTIONS: +
+        SOURCE_DIR: 1
         SVN_REPOSITORY: 1
         SVN_REVISION: 1
-        SOURCE_DIR: 1
-        DOWNLOAD_COMMAND: 1
-        FIND_PACKAGE_ARGUMENTS: 1
-        NO_CACHE: 1
-        GIT_SHALLOW: 1
         URL: 1
         URL_HASH: 1
         URL_MD5: 1
+        VERSION: 1
+      pargs:
+        flags: []
+        nargs: '*'
+      spelling: CPMAddPackage
+    cpmdeclarepackage:
+      kwargs:
+        DOWNLOAD_COMMAND: 1
         DOWNLOAD_NAME: 1
         DOWNLOAD_NO_EXTRACT: 1
-        HTTP_USERNAME: 1
+        DOWNLOAD_ONLY: 1
+        FIND_PACKAGE_ARGUMENTS: 1
+        FORCE: 1
+        GITHUB_REPOSITORY: 1
+        GITLAB_REPOSITORY: 1
+        GIT_REPOSITORY: 1
+        GIT_SHALLOW: 1
+        GIT_TAG: 1
         HTTP_PASSWORD: 1
-        OPTIONS: +
-    cpmfindpackage:
-      pargs:
-        nargs: '*'
-        flags: []
-      spelling: CPMFindPackage
-      kwargs: *cpmaddpackagekwargs
-    cpmdeclarepackage:
-      pargs:
-        nargs: '*'
-        flags: []
-      spelling: CPMDeclarePackage
-      kwargs: *cpmaddpackagekwargs
-    packageproject:
-      pargs:
-        nargs: '*'
-        flags: []
-      spelling: packageProject
-      kwargs:
+        HTTP_USERNAME: 1
         NAME: 1
+        NO_CACHE: 1
+        OPTIONS: +
+        SOURCE_DIR: 1
+        SVN_REPOSITORY: 1
+        SVN_REVISION: 1
+        URL: 1
+        URL_HASH: 1
+        URL_MD5: 1
         VERSION: 1
-        NAMESPACE: 1
-        INCLUDE_DIR: 1
-        INCLUDE_DESTINATION: 1
-        BINARY_DIR: 1
-        COMPATIBILITY: 1
-        VERSION_HEADER: 1
-        EXPORT_HEADER: 1
-        DISABLE_VERSION_SUFFIX: 1
-        DEPENDENCIES: +
-    cpmusepackagelock:
-      pargs: 1
-      spelling: CPMUsePackageLock
-    cpmregisterpackage:
-      pargs: 1
-      spelling: CPMRegisterPackage
+      pargs:
+        flags: []
+        nargs: '*'
+      spelling: CPMDeclarePackage
+    cpmfindpackage:
+      kwargs:
+        DOWNLOAD_COMMAND: 1
+        DOWNLOAD_NAME: 1
+        DOWNLOAD_NO_EXTRACT: 1
+        DOWNLOAD_ONLY: 1
+        FIND_PACKAGE_ARGUMENTS: 1
+        FORCE: 1
+        GITHUB_REPOSITORY: 1
+        GITLAB_REPOSITORY: 1
+        GIT_REPOSITORY: 1
+        GIT_SHALLOW: 1
+        GIT_TAG: 1
+        HTTP_PASSWORD: 1
+        HTTP_USERNAME: 1
+        NAME: 1
+        NO_CACHE: 1
+        OPTIONS: +
+        SOURCE_DIR: 1
+        SVN_REPOSITORY: 1
+        SVN_REVISION: 1
+        URL: 1
+        URL_HASH: 1
+        URL_MD5: 1
+        VERSION: 1
+      pargs:
+        flags: []
+        nargs: '*'
+      spelling: CPMFindPackage
     cpmgetpackageversion:
       pargs: 2
       spelling: CPMGetPackageVersion
+    cpmregisterpackage:
+      pargs: 1
+      spelling: CPMRegisterPackage
+    cpmusepackagelock:
+      pargs: 1
+      spelling: CPMUsePackageLock
+    packageproject:
+      kwargs:
+        BINARY_DIR: 1
+        COMPATIBILITY: 1
+        DEPENDENCIES: +
+        DISABLE_VERSION_SUFFIX: 1
+        EXPORT_HEADER: 1
+        INCLUDE_DESTINATION: 1
+        INCLUDE_DIR: 1
+        NAME: 1
+        NAMESPACE: 1
+        VERSION: 1
+        VERSION_HEADER: 1
+      pargs:
+        flags: []
+        nargs: '*'
+      spelling: packageProject
+format:
+  line_width: 123
+  tab_size: 2
+  max_subgroups_hwrap: 4
+  max_pargs_hwrap: 4
+  max_rows_cmdline: 8
+  separate_ctrl_name_with_space: false
+  separate_fn_name_with_space: false
+  dangle_parens: true
+  min_prefix_chars: 8
+  max_lines_hwrap: 3
+  line_ending: unix
+markup:
+  bullet_char: '*'
+  enum_char: .
+  enable_markup: false

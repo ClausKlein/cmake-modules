@@ -25,7 +25,13 @@
 ## find a single library. called by get_library_list. May be used
 ## for optional libraries in a package
 ##--------------------------------------------------------------------
-macro(get_pkg_library PKG_PREFIX LIBRARY_DIR DEBUG_POSTFIX LIBRARY_NAME GET_DEBUG_AND_RELEASE)
+macro(get_pkg_library
+      PKG_PREFIX
+      LIBRARY_DIR
+      DEBUG_POSTFIX
+      LIBRARY_NAME
+      GET_DEBUG_AND_RELEASE
+)
 
   set(LIBRARY_VAR_NAME ${PKG_PREFIX}_${LIBRARY_NAME}_LIBRARY)
 
@@ -107,7 +113,12 @@ endmacro()
 ## LIBRARY_NAMES : list of library names to search for
 ## (optional)    : set to TRUE if you want to search for debug&release lib names on UNIX
 ##---------------------------------------------------------------------------
-macro(get_library_list PKG_PREFIX LIBRARY_DIR DEBUG_POSTFIX LIBRARY_NAMES)
+macro(get_library_list
+      PKG_PREFIX
+      LIBRARY_DIR
+      DEBUG_POSTFIX
+      LIBRARY_NAMES
+)
 
   set(GET_DEBUG_AND_RELEASE FALSE)
   if(WIN32)
@@ -118,7 +129,13 @@ macro(get_library_list PKG_PREFIX LIBRARY_DIR DEBUG_POSTFIX LIBRARY_NAMES)
   endif()
 
   foreach(LIBRARY_NAME ${LIBRARY_NAMES})
-    get_pkg_library(${PKG_PREFIX} ${LIBRARY_DIR} ${DEBUG_POSTFIX} ${LIBRARY_NAME} ${GET_DEBUG_AND_RELEASE})
+    get_pkg_library(
+      ${PKG_PREFIX}
+      ${LIBRARY_DIR}
+      ${DEBUG_POSTFIX}
+      ${LIBRARY_NAME}
+      ${GET_DEBUG_AND_RELEASE}
+    )
     ##-- add it to the list
     ##------------------------
     if(${LIBRARY_VAR_NAME})
