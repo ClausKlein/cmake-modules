@@ -1,3 +1,5 @@
+# cmake-format: off
+
 find_program(GIT_PROGRAM git REQUIRED)
 message(DEBUG "${GIT_PROGRAM}")
 
@@ -17,7 +19,7 @@ string(STRIP ${GIT_TOPLEVEL} GIT_TOPLEVEL)
 
 # filter a git repository's files.
 function(get_cmake_files)
-    cmake_parse_arguments("" "" "GIT_PATTERN;OUTPUT_LIST" "" ${ARGN})
+    cmake_parse_arguments("" "" "OUTPUT_LIST" "GIT_PATTERN" ${ARGN})
 
     execute_process(
         COMMAND
@@ -31,8 +33,9 @@ function(get_cmake_files)
     set(${_OUTPUT_LIST} ${all_files} PARENT_SCOPE)
 endfunction()
 
-get_cmake_files(GIT_PATTERN ::*.cpp OUTPUT_LIST CPP_FILES)
+get_cmake_files(GIT_PATTERN ::*.cpp ::*.cxx OUTPUT_LIST CPP_FILES)
 
+list(TRANSFORM CPP_FILES PREPEND ${GIT_TOPLEVEL}/)
 execute_process(
     COMMAND ${PYTHON_PROGRAM} ${CLANG_TIDY_PROGRAM} -p build ${CPP_FILES}
     WORKING_DIRECTORY ${GIT_TOPLEVEL}
@@ -50,21 +53,24 @@ return()
 # NOTE: this fails if not all cpp files are used within the cmake project!
 foreach(cmake_file IN LISTS CPP_FILES)
     message(DEBUG "${cmake_file}")
-    set(_source_cmake_file ${GIT_TOPLEVEL}/${cmake_file})
+    # set(_source_cmake_file ${GIT_TOPLEVEL}/${cmake_file})
 
     execute_process(
-        COMMAND clang-tidy -p build ${_source_cmake_file}
+        COMMAND clang-tidy -p build ${cmake_file}
         WORKING_DIRECTORY ${GIT_TOPLEVEL}
         COMMAND_ECHO STDOUT
-        OUTPUT_FILE clang-tidy.log
-        ERROR_FILE clang-tidy.log
+        OUTPUT_VARIABLE clang-tidy.out
+        ERROR_VARIABLE clang-tidy.err
         ECHO_OUTPUT_VARIABLE
         ECHO_ERROR_VARIABLE
         RESULT_VARIABLE result
     )
+    file(APPEND run-clang-tidy.log ${clang-tidy.out} ${clang-tidy.err})
 
     if(result)
         message(FATAL_ERROR "clang-tidy ${cmake_file} failed!")
     endif()
 endforeach()
 #XXX ##############################################################
+
+# cmake-format: on
